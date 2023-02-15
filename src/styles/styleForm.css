@@ -1,0 +1,33 @@
+.icon
+{
+    filter: invert(1);
+    max-width: 2.5%;
+    vertical-align: middle;
+}
+
+h1
+{
+    text-align: center;
+}
+
+.inputFields
+{
+    display: flex;
+    margin: 30px 0px 15px 0px;
+}
+
+input 
+{
+    width: 100%;
+    margin: 10px 20px 5px 0px;
+    padding: 15px 20px;
+    outline: none;
+}
+
+label
+{
+    text-align: center;
+    width: 25%;
+    margin: 10px 80px 5px 25px;
+    border-bottom: 2px dotted;
+}

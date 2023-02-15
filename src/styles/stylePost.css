@@ -1,0 +1,53 @@
+#post
+{
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    background-color: #b3aacfa4;
+    font-size: 20px;
+    margin: 20px 20px;
+    width: 100%;
+    align-content: space-between;
+}
+
+.content
+{
+    margin: 10px 50px;
+}
+
+.userInfo
+{
+    text-decoration:overline;
+    margin-left: 50px;
+}
+
+.title
+{
+    text-align: center;
+    font-size: 24px;
+}
+
+
+.postActions
+{
+    width: 100%;
+    display: inline-flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.commentField
+{
+    width: 80%;
+    margin-left: 50px;
+}
+
+#comment
+{
+    background-color: #b3aacfa4;
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 10px 20px;
+}
