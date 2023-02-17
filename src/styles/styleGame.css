@@ -1,0 +1,46 @@
+#post
+{
+    display: inline-flex;
+    height: auto;
+    background-color: #b3aacfa4;
+    font-size: 20px;
+    margin: 20px 20px;
+    align-items: center;
+}
+
+.content
+{
+    display: inline-flex;
+    flex-direction: column;
+    width: auto;
+    margin: 10px 25px;
+    vertical-align: middle;
+}
+
+.gameLogo
+{
+    max-width: 100%;
+    height: auto;
+    vertical-align:middle;
+    padding: 20px 20px;
+}
+
+.gameInfos
+{
+    display: inline-flex;
+    height: auto;
+    vertical-align:middle;
+    justify-content: space-around;
+}
+
+.gameDesc
+{
+    display: inline-flex;
+    max-width: 75%;
+}
+
+.userInfo
+{
+    text-decoration:underline;
+    margin-left: 50px;
+}

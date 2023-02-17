@@ -15,6 +15,31 @@ export default function Topbar()
   /* State variables */
   const navigate=useNavigate();
 
+  /*async function getUserInfo() {
+    const token = localStorage.getItem("token");
+
+    /* Request config
+    const options = {
+      method: "GET",
+      headers: {
+        Authorization: "bearer " + token,
+      },
+    };
+
+    const response = await fetch("http://localhost:3001/api/user", options);
+  }*/
+
+  function disconnect()
+  {
+    navigate("/");
+    localStorage.removeItem("userToken");
+  }
+  
+  function goToConnect()
+  {
+    navigate("/login");
+  }
+
   return (
     <div id="topbar">
       <div className="topbar-line">
@@ -24,7 +49,7 @@ export default function Topbar()
             <Link className="link" to="/"><img className="sideIcon" src={logoHome} alt="Icone de l'Accueil"></img> Accueil</Link>
           </div>
           <div className="linkDiv">
-            <Link className="link" to="/activity"><img className="sideIcon" src={icoActivity} alt="Icone des posts"></img> Liste des jeux</Link>
+            <Link className="link" to="/games-list"><img className="sideIcon" src={icoActivity} alt="Icone des posts"></img> Liste des jeux</Link>
           </div>
           <div className="linkDiv">
             <Link className="link" to="/login"><img className="sideIcon" src={logoLogin} alt="Icone de Connexion"></img> Connexion</Link>
@@ -32,18 +57,25 @@ export default function Topbar()
           <div className="linkDiv">
             <Link className="link" to="/sign-up"><img className="sideIcon" src={logoSignUp} alt="Icone d'inscription"></img> Inscription</Link>
           </div>
+        {
+          localStorage.getItem ("userToken") != null && (
+            <div>
+              <div>
+                <button onClick={disconnect}>Deconnexion</button>
+              </div>  
+                <div className = "line" onClick={null}>
+                <img className="userIcon" src={user} alt="Icone utilisateur"></img>
+                <p> Bonjour, {null}</p>
+              </div>
+            </div>  
+        )}
+        {
+          localStorage.getItem ("userToken") == null && ( 
+          <div className = "line" onClick={goToConnect}>
+            <p>Se connecter</p>
+          </div> 
+        )}
         </nav>
-        <div>
-          <button onClick={null}>Deconnexion</button>
-        </div>
-
-        <div className = "line" onClick={null}>
-          <img className="userIcon" src={user} alt="Icone utilisateur"></img>
-          <p> Bonjour, {null} {null}</p>
-        </div>
-        <div className = "line" onClick={null}>
-          <p>Se connecter</p>   
-        </div> 
       </div>   
     </div>
   );

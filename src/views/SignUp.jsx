@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Topbar from "../components/Topbar"
 import Footer from "../components/Footer"
@@ -13,6 +14,7 @@ function SignUp()
     /* State variables */
     const [userSignup, setUserSignup]=useState ({pseudo:"", mail:"", password:""});
     const [errorMsg, setErrorMsg]=useState ("");
+    const navigate = useNavigate();
 
     // Modify input values
     function changeInput(e)
@@ -26,7 +28,7 @@ function SignUp()
         e.preventDefault();
         if ((userSignup.pseudo && userSignup.mail && userSignup.password) === "")
         {
-            setErrorMsg("Un ou plusieurs champs ne sont pas remplis");
+            setErrorMsg("Erreur : Un ou plusieurs champs ne sont pas remplis");
         }
         else 
         {
@@ -44,38 +46,18 @@ function SignUp()
                 })
             })
             .then((response) => response.json())
-            .then((responseData) => 
-            {
-                console.log("POST Response", "Response Body -> " + JSON.stringify(responseData));
-                return responseData;
-            })
+            .then((responseData) => { return responseData; })
             .then(results => {
-                setErrorMsg("Erreur : " + results.message);
+                setErrorMsg(results.message);
+                if (results.message === "Compte crée")
+                {
+                    userSignup.pseudo = "";
+                    userSignup.mail = "";
+                    userSignup.password = "";
+                    navigate('/login');
+                }
             })
         }
-            /*const options=
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    pseudo: userSignup.pseudo,
-                    mail: userSignup.mail,
-                    password: userSignup.password
-                })
-            };
-            try
-            {
-                const reponse=await fetch('http://localhost:3030/signup', options)
-                console.log (reponse.body);
-            }
-            catch (error)
-            {
-                console.log (error.status);
-                setErrorMsg(JSON.parse(error));
-            }
-        }*/
     }
 
     return (
@@ -86,8 +68,8 @@ function SignUp()
                 <p>T'as 3 choses à rentrer : <br />
                 - ton pseudo (unique, hein, on l'est tous après tout)<br />
                 - une adresse mail valide<br />
-                - un mot de passe (entre 3 et et caractères, avec au moins une minuscule et un caractère spécial)</p>
-                {errorMsg}
+                - un mot de passe (entre 3 et 16 caractères, avec au moins une minuscule et un caractère spécial)</p>
+                <div id = "errorMsg">{errorMsg}</div>
                 <form onSubmit={signUser}>
                     <div className="inputFields">
                         <label htmlFor="pseudo">Pseudo</label>
@@ -99,7 +81,7 @@ function SignUp()
                     </div>
                     <div className="inputFields">
                         <label htmlFor="password">Mot de passe</label>
-                        <input name="password" type="password" placeholder="Entrer un mot de passe" onChange={changeInput} value={userSignup.password}></input>
+                        <input name="password" type="password" minLength = "3" maxLength = "16" placeholder="Entrer un mot de passe" onChange={changeInput} value={userSignup.password}></input>
                     </div>
                     <div className="inputFields">
                         <input type="submit" value="Envoyer" />

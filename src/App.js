@@ -1,9 +1,10 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import Home from "./views/Home";
-import PostsPage from "./views/Posts";
 import LoginPage from "./views/Login";
 import SignUpPage from "./views/SignUp";
+import GamesListPage from "./views/GamesList";
+import AddGamePage from "./views/AddGame";
 import ProfilePage from "./views/Profile";
 import OtherProfile from "./views/OtherProfile";
 import ErrorPage from "./views/Error";
@@ -17,8 +18,12 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />
   },
   {
-    path: "/activity",
-    element: <PostsPage />
+    path: "/games-list",
+    element: <GamesListPage />
+  },
+  {
+    path: "/add-game",
+    element: <AddGamePage />
   },
   {
     path: "/login",

@@ -11,7 +11,7 @@ import '../styles/styleForm.css';
 
 function Login()
 {
-    /* State vriables */
+    /* State variables */
     const [userLogin, setUserLogin]=useState ({mail:"", password:""});
     const [errorMsg, setErrorMsg]=useState ("");
     const navigate = useNavigate();
@@ -25,16 +25,40 @@ function Login()
 
     async function loginUser(e)
     {
-        /*e.preventDefault();
-        let result=await login(userLogin.mail, userLogin.password); // Utilisation de la fonction login
-        if (result.success)
+        e.preventDefault();
+        if ((userLogin.mail && userLogin.password) === "")
         {
-            navigate('/activity');
+            setErrorMsg("Un ou plusieurs champs ne sont pas remplis");
         }
-        else
+        else 
         {
-            setErrorMsg(result.message);
-        }*/
+            const response = await fetch("http://localhost:3030/login", 
+            {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    mail: userLogin.mail,
+                    password: userLogin.password
+                })
+            })
+            const data = await response.json();
+            if (data.message !== "Connexion réussie")
+            {
+                setErrorMsg(data.message);
+            }
+            else if (data.message === "Connexion réussie")
+            {
+                console.log (data);
+                const token = data.token;
+                localStorage.setItem("userToken", token);
+                userLogin.mail = "";
+                userLogin.password = "";
+                navigate('/games-list');
+            }
+        }
     }
 
     return (
@@ -43,7 +67,7 @@ function Login()
             <div id="page">
                 <h1><img className="icon" src={logoLogin} alt="Icon Login"></img> Connexion</h1>
                 <p>Vous n'avez pas encore de compte ? <Link to="/sign-up">Inscrivez-vous</Link></p>
-                <p>{errorMsg}</p>
+                <div id = "errorMsg">{errorMsg}</div>
                 <form onSubmit={loginUser}>
                     <div className="inputFields">
                         <label htmlFor="mail">Mail</label>
