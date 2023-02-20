@@ -43,7 +43,6 @@ function AddGame()
     // Return a list of games pertaining to a name and a limit
     async function searchGameAPI()
     {
-        console.log(gameName + " " + gameLimit);
         setGameList([]);
         // Check the database for games
         const options = 
@@ -52,6 +51,7 @@ function AddGame()
             headers: 
             {
                 "x-api-key": 'Jhv2zA6cA44jgEviGcz692gMoCqIdimn9gpTE7ke',
+                
             },
             body: `fields name, summary, slug, genres.name, age_ratings.rating, cover.url, involved_companies.company.name, first_release_date, platforms.name; search:"${gameName}"; limit:${gameLimit};`
         };
@@ -68,12 +68,13 @@ function AddGame()
 
             if (Array.isArray(response)) 
             {
+                console.log(response);
                 setGameList(response);
                 setErrorMsg("");
             }
         })
         .catch(err => console.error(err));
-        console.log(gameList);
+
     }
 
     return (
@@ -95,6 +96,7 @@ function AddGame()
                 <div>
                 {
                     gameList.map((game, index) => (
+                        game.cover.url && game.name &&game.platforms &&game.genres && game.summary && game.first_release_date && game.age_ratings && game.slug && game.involved_companies &&(
                         <GameSearched
                         key = {index}
                         img = {game.cover.url} 
@@ -106,7 +108,7 @@ function AddGame()
                         age_ratings = {game.age_ratings}
                         slug = {game.slug}
                         involved_companies = {game.involved_companies}
-                        />        
+                        />  )    
                     ))
                 }                    
                 </div>

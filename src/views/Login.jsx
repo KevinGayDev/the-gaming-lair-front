@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import Topbar from "../components/Topbar"
@@ -8,10 +8,12 @@ import logoLogin from "../pictures/ico_login.png"
 
 import '../styles/stylePage.css';
 import '../styles/styleForm.css';
+import { UserContext } from '../App';
 
 function Login()
 {
     /* State variables */
+    const {setCurrentUser} = useContext(UserContext);
     const [userLogin, setUserLogin]=useState ({mail:"", password:""});
     const [errorMsg, setErrorMsg]=useState ("");
     const navigate = useNavigate();
@@ -32,31 +34,37 @@ function Login()
         }
         else 
         {
-            const response = await fetch("http://localhost:3030/login", 
+            try 
             {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    mail: userLogin.mail,
-                    password: userLogin.password
+                const response = await fetch("http://localhost:3030/login", 
+                {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        mail: userLogin.mail,
+                        password: userLogin.password
+                    })
                 })
-            })
-            const data = await response.json();
-            if (data.message !== "Connexion réussie")
-            {
-                setErrorMsg(data.message);
-            }
-            else if (data.message === "Connexion réussie")
-            {
-                console.log (data);
-                const token = data.token;
-                localStorage.setItem("userToken", token);
-                userLogin.mail = "";
-                userLogin.password = "";
+
+                const data = await response.json();
+                console.log(data);
+                if (response.status !== 200) 
+                {
+                    setErrorMsg(data.message);
+                    return;
+                }
+
+                localStorage.setItem("userToken", data.token);
+                setCurrentUser(data.user);  
                 navigate('/games-list');
+            } 
+            catch (error) 
+            {
+                console.log(error);
+                setErrorMsg("Une erreur s'est produite.");
             }
         }
     }

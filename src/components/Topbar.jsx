@@ -1,7 +1,6 @@
-import { Link } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-import user from '../pictures/ico_user.png';
 import logo from "../pictures/logo_network.png"
 import icoActivity from "../pictures/ico_activity.png"
 import logoHome from "../pictures/ico_home.png"
@@ -9,35 +8,28 @@ import logoLogin from "../pictures/ico_login.png"
 import logoSignUp from "../pictures/ico_signup.png"
 
 import '../styles/styleTopbar.css';
+import { UserContext } from '../App';
 
 export default function Topbar() 
 {
   /* State variables */
+  const {currentUser, disconnect} = useContext(UserContext);
   const navigate=useNavigate();
 
-  /*async function getUserInfo() {
-    const token = localStorage.getItem("token");
-
-    /* Request config
-    const options = {
-      method: "GET",
-      headers: {
-        Authorization: "bearer " + token,
-      },
-    };
-
-    const response = await fetch("http://localhost:3001/api/user", options);
-  }*/
-
-  function disconnect()
+  function goToProfile()
   {
-    navigate("/");
-    localStorage.removeItem("userToken");
+    navigate(`/my-profile`);    
   }
   
   function goToConnect()
   {
     navigate("/login");
+  }
+
+  function logout()
+  {
+    disconnect();
+    navigate("/");
   }
 
   return (
@@ -51,26 +43,28 @@ export default function Topbar()
           <div className="linkDiv">
             <Link className="link" to="/games-list"><img className="sideIcon" src={icoActivity} alt="Icone des posts"></img> Liste des jeux</Link>
           </div>
+          {
+          !currentUser && (
+          <>
           <div className="linkDiv">
             <Link className="link" to="/login"><img className="sideIcon" src={logoLogin} alt="Icone de Connexion"></img> Connexion</Link>
           </div>
           <div className="linkDiv">
             <Link className="link" to="/sign-up"><img className="sideIcon" src={logoSignUp} alt="Icone d'inscription"></img> Inscription</Link>
           </div>
+          </>
+          )}
         {
-          localStorage.getItem ("userToken") != null && (
+          currentUser && (
             <div>
-              <div>
-                <button onClick={disconnect}>Deconnexion</button>
-              </div>  
-                <div className = "line" onClick={null}>
-                <img className="userIcon" src={user} alt="Icone utilisateur"></img>
-                <p> Bonjour, {null}</p>
+              <button onClick={logout}>Deconnexion</button>
+              <div className = "line" onClick={goToProfile}>
+                <p> Bonjour, {currentUser.pseudo}</p>
               </div>
             </div>  
         )}
         {
-          localStorage.getItem ("userToken") == null && ( 
+          !currentUser && ( 
           <div className = "line" onClick={goToConnect}>
             <p>Se connecter</p>
           </div> 

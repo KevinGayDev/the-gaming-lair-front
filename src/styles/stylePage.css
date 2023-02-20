@@ -1,7 +1,6 @@
 html
 {
     background-image: url("../pictures/background_image.jpg");
-    vertical-align: middle;
 }
 
 #page
@@ -14,6 +13,24 @@ html
     border-radius: 50px;
     text-align: center;
 }
+
+#gameSearched
+{
+    display: block;
+    position: absolute;
+    background-color: #3d085c;
+    z-index: 1;
+    margin: 75px 0px 0px 0px;
+    padding: 0px 10px;
+    width: 85%;
+}
+
+#gameList
+{
+    display: block;
+    position: relative;
+}
+
 
 #content
 {

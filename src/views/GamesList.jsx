@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import Topbar from "../components/Topbar"
 import Footer from "../components/Footer"
@@ -36,6 +36,10 @@ function GamesList()
             {
                 clearTimeout(timeoutId);
             };
+        }
+        if (gameName === "" && gameSearched.length > 0)
+        {
+            setGameSearched([]);
         }
     }, [gameName]);
 
@@ -75,7 +79,7 @@ function GamesList()
         .catch(err => console.error(err));
     }
 
-    // Display the latest 10 games
+    // Display the latest 10 games redcorded in database
     async function displayGames()
     {
         await fetch('http://localhost:3030/games')
@@ -101,48 +105,45 @@ function GamesList()
         <div>
             <Topbar />
             <div id="page">
-            {
-                localStorage.getItem ("userToken") != null && (
+                {/*Div for adding a game to database (only if user connected)*/}
+                {localStorage.getItem ("userToken") != null && (
                     <div>
                         <p>Vous ne trouvez pas un jeu ? Ajoutez-le en cliquant sur le bouton ci-dessous.</p>
                         <button className = "postBtn" onClick = {addGame}> Ajouter un jeu</button>
                     </div>
                 )}
-                {
-                    localStorage.getItem ("userToken") == null && (
-                        <div>
-                        <div>
-                            <p>Veuillez vous connecter pour accéder a la fonctionnalité d'ajout de jeu</p>
-                        </div>
-                        </div>  
-                    )}
+                {/*Div for adding game to database (if user not connected)*/}
+                {localStorage.getItem ("userToken") === null && (
+                    <div>
+                        <p>Veuillez vous connecter pour accéder a la fonctionnalité d'ajout de jeu</p>
+                    </div>
+                )}
+                {/*Div for searching precise games and going to their page*/}
                 <div>
                     <p>Chercher des jeux dans la base de données</p>
                     <div className="inputFields">
                         <label htmlFor="game">Chercher un jeu</label>
                         <input name="game" type="text" placeholder="Exemple : God of War" onChange={(e) => setGameName(e.target.value)} value={gameName}></input>
-                    </div>
                     {errorMsg}
-                    <div>
-                        {
-                           gameSearched.map((game, index) => (
-                            <Game 
-                            key = {index}
-                            img = {game.image} 
-                            title = {game.name} 
-                            platforms = {game.consoles}
-                            category = {game.genre} 
-                            involved_companies = {game.developper}
-                            summary = {game.description}
-                            />        
-                        ))
-                        }
+                        <div id = "gameSearched">
+                            {gameSearched.map((game, index) => (
+                                    <Game 
+                                    key = {index}
+                                    img = {game.image} 
+                                    title = {game.name} 
+                                    platforms = {game.consoles}
+                                    category = {game.genre} 
+                                    involved_companies = {game.developper}
+                                    summary = {game.description}
+                                    slug = {game.slug}
+                                    />        
+                            ))}
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <p>Les 10 derniers jeux enregistrés</p>
-                    {
-                        gameList.map((game, index) => (
+                    {/*Liste of the ten latest recordedin database*/}
+                    <div id = "gameList">
+                        <p>Les 10 derniers jeux enregistrés</p>
+                        {gameList.map((game, index) => (
                             <Game 
                             key = {index}
                             img = {game.image} 
@@ -151,10 +152,11 @@ function GamesList()
                             category = {game.genre} 
                             involved_companies = {game.developper}
                             summary = {game.description}
+                            slug = {game.slug}
                             />        
-                        ))
-                    }
-                </div>
+                        ))}
+                    </div>
+                </div> 
              </div>
             <Footer />
         </div>  

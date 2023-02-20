@@ -1,0 +1,60 @@
+#gamePage
+{
+
+    background-color: #8672c5d5;
+    font-size: 24px;
+    margin: 25px 50px 25px 100px;
+    padding: 25px 50px 25px 50px;
+    border-radius: 50px;
+    text-align: center;
+}
+
+#gameCover
+{
+    max-width: 100%;
+    height: auto;
+    vertical-align:middle;
+    padding: 20px 20px;
+}
+
+#gameInfos
+{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-content: stretch;
+    width:50%;
+}
+
+#gameContent
+{
+    display: inline-flex;
+    flex-direction: row;
+    margin: 10px 25px;
+    vertical-align: middle;
+    width: 100%;
+    justify-content: space-around;
+}
+
+#gameDescription
+{
+    display: block;
+    flex-direction: column;
+    margin: 10px 25px;
+    width:auto;
+}
+
+.infosTitle
+{
+    text-decoration:underline;
+}
+
+#gameActions
+{
+    display: inline-flex;
+    flex-direction: row;
+    margin: 10px 25px;
+    vertical-align: middle;
+    width: 100%;
+    justify-content: space-around;
+}
