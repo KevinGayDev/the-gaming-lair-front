@@ -60,45 +60,36 @@ function GamesList()
             
         };
         
-        await fetch('http://localhost:3030/games/search', options)
-        .then(response => response.json())
-        .then(response => 
+        const response = await fetch('http://localhost:3030/games/search', options);
+        const data = await response.json();
+        if (!data) 
         {
-            if (!response) 
-            {
-                setGameSearched([]);
-                setErrorMsg("Aucun résultat trouvé");
-            }
-
-            if (Array.isArray(response)) 
-            {
-                setGameSearched(response);
-                setErrorMsg("");
-            }
-        })
-        .catch(err => console.error(err));
+            setGameSearched([]);
+            setErrorMsg("Aucun résultat trouvé");
+        }
+        else if (Array.isArray(data)) 
+        {
+            setGameSearched(data);
+            setErrorMsg("");
+        }
     }
 
     // Display the latest 10 games redcorded in database
     async function displayGames()
     {
-        await fetch('http://localhost:3030/games')
-        .then(response => response.json())
-        .then(response => 
+        const response = await fetch('http://localhost:3030/games');
+        const data = await response.json()
+        if (!data) 
         {
-            if (!response) 
-            {
-                setGameList([]);
-                setErrorMsg("Aucun résultat trouvé");
-            }
+            setGameList([]);
+            setErrorMsg("Aucun résultat trouvé");
+        }
 
-            if (Array.isArray(response)) 
-            {
-                setGameList(response);
-                setErrorMsg("");
-            }
-        })
-        .catch(err => console.error(err));
+        if (Array.isArray(data)) 
+        {
+            setGameList(data);
+            setErrorMsg("");
+        }
     }
 
     return (
@@ -160,7 +151,7 @@ function GamesList()
              </div>
             <Footer />
         </div>  
-    );
+    )
 }
 
 export default GamesList;

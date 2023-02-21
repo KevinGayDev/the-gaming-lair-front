@@ -46,22 +46,22 @@ export default function Topbar()
           {
           !currentUser && (
           <>
-          <div className="linkDiv">
-            <Link className="link" to="/login"><img className="sideIcon" src={logoLogin} alt="Icone de Connexion"></img> Connexion</Link>
-          </div>
-          <div className="linkDiv">
-            <Link className="link" to="/sign-up"><img className="sideIcon" src={logoSignUp} alt="Icone d'inscription"></img> Inscription</Link>
-          </div>
+            <div className="linkDiv">
+              <Link className="link" to="/login"><img className="sideIcon" src={logoLogin} alt="Icone de Connexion"></img> Connexion</Link>
+            </div>
+            <div className="linkDiv">
+              <Link className="link" to="/sign-up"><img className="sideIcon" src={logoSignUp} alt="Icone d'inscription"></img> Inscription</Link>
+            </div>
           </>
           )}
         {
           currentUser && (
-            <div>
+            <>
               <button onClick={logout}>Deconnexion</button>
               <div className = "line" onClick={goToProfile}>
                 <p> Bonjour, {currentUser.pseudo}</p>
               </div>
-            </div>  
+            </>  
         )}
         {
           !currentUser && ( 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Topbar from "../components/Topbar"
 import Footer from "../components/Footer"
 import '../styles/stylePage.css';
@@ -7,27 +7,19 @@ import '../styles/styleForm.css';
 
 import { UserContext } from '../App';
 
-
-const dateFormatting = Intl.DateTimeFormat("fr-FR", {
-    dateStyle: "short",
-    timeStyle: "long"
-  });
-
 function Profile() 
 {
     /* State variables */
-    const {currentUser, disconnect} = useContext(UserContext);
+    const {setCurrentUser, disconnect} = useContext(UserContext);
     const [editMode, setEditMode] = useState (false);
     const [userProfile, setUserProfile]=useState ({});
-    const [currentUserProfile, setCurrentUserProfile] = useState({pseudo: userProfile.pseudo, mail: userProfile.mail, password: userProfile.password, });
+    const [currentUserProfile, setCurrentUserProfile] = useState({pseudo: "", mail: "", latestGame: "", bestGame: "", worstGame: ""});
 
     const navigate=useNavigate();
 
-    let params = useParams();
     useEffect(() => {displayProfile()}, [])    
 
-    let formattedDate;
-
+    //#region METHODS_FETCH
     // Return a list of games pertaining to a name and a limit
     async function displayProfile()
     {
@@ -39,33 +31,81 @@ function Profile()
             {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                Authorization: "Bearer " + token,
+                Authorization: "Bearer " + token
             }
         };
-        
-        await fetch('http://localhost:3030/profile', options)
-        .then(response => response.json())
-        .then(response => 
+
+        const response = await fetch('http://localhost:3030/profile', options)
+        const data = await response.json();
+        if (!data) 
         {
-            console.log(response);
-            if (!response) 
-            {
-                setUserProfile([]);
-            }
-            setUserProfile(response);
-        })
-        .catch(err => console.error(err));
+            setUserProfile([]);
+        }
+        else 
+        {
+            setUserProfile(data);
+        }
         console.log(userProfile);
     }
-    
-    // Convert the date from time stamp
-    async function convertDate (date)
+
+    async function updateProfile()
     {
-        if (date !== null)
+        if (currentUserProfile.pseudo === "")
         {
-            formattedDate = date.slice(0,10);
+            console.log("Pseudo empty");
+            currentUserProfile.pseudo = userProfile.pseudo;
         }
-        return formattedDate;
+        if (currentUserProfile.mail === "")
+        {
+            console.log("Mail empty");
+            currentUserProfile.mail = userProfile.mail;
+        }
+        if (currentUserProfile.latestGame === "")
+        {
+            console.log("latest game empty");
+            currentUserProfile.latestGame = userProfile.mostRecentGamePlayed;
+        }
+        if (currentUserProfile.bestGame === "")
+        {
+            console.log("best game empty");
+            currentUserProfile.bestGame = userProfile.bestGamePlayed;
+        }
+        if (currentUserProfile.worstGame === "")
+        {
+            console.log("Worst game empty");
+            currentUserProfile.worstGame = userProfile.worstGamePlayed;
+        }
+
+        const options = 
+        {
+            method: 'PUT',
+            headers: 
+            {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: "Bearer " + localStorage.getItem("userToken")
+            },
+            body: JSON.stringify({
+                id: userProfile._id,
+                pseudo: currentUserProfile.pseudo,
+                mail: currentUserProfile.mail,
+                mostRecentGamePlayed: currentUserProfile.latestGame,
+                bestGamePlayed: currentUserProfile.bestGame,
+                worstGamePlayed: currentUserProfile.worstGame
+            })
+        };
+
+        const response = await fetch('http://localhost:3030/profile', options)
+        const data = await response.json();
+        if (data.message !== "Utilisateur modifié") 
+        {
+            return;
+        }
+        else if (data.message === "Utilisateur modifié") 
+        {
+            navigate('/games-list');
+            setCurrentUser(data.user);  
+        }
     }
 
     async function deleteProfile()
@@ -86,78 +126,125 @@ function Profile()
         
         const response = await fetch('http://localhost:3030/profile', options)
         const data = await response.json();
-
         console.log(data);
-        if (data.status !== 200) 
+        if (data.message !== "Utilisateur supprimé") 
         {
             return;
         }
-        else {
+        else if (data.message === "Utilisateur supprimé") 
+        {
             disconnect();
             navigate('/');
         }
     }
+    //#endregion
 
-    convertDate (userProfile.signDate);
+    //#region METHODS_PAGE
+    function changeInput(e)
+    {
+        currentUserProfile[e.target.name]=e.target.value;
+        setCurrentUserProfile({...currentUserProfile});
+    }
+
+    function displayInputField()
+    {
+        if (editMode === true)
+        {
+            return (
+                <div>
+                    <div className="inputFields">
+                     <label htmlFor="pseudo">Pseudo</label>
+                        <input type = "text" name = "pseudo" placeholder = "Entrer un pseudo unique" value = {currentUserProfile.pseudo} onChange = {changeInput} />
+                    </div>
+                    <div className="inputFields">
+                    <label htmlFor="mail">Adresse mail</label>
+                        <input type = "mail" name = "mail" placeholder = "Entrer une adresse mail unique" value = {currentUserProfile.mail} onChange = {changeInput} />
+                    </div>
+                    <div className="inputFields">
+                    <label htmlFor="latestGame">Jeu le plus récent</label>
+                        <input type = "text" name = "latestGame" placeholder = "Entrer un nom de jeu" value = {currentUserProfile.latestGame} onChange = {changeInput} />
+                    </div>  
+                    <div className="inputFields">
+                    <label htmlFor="bestGame">Meilleur jeu</label>
+                        <input type = "text" name = "bestGame" placeholder = "Entrer un nom de jeu" value = {currentUserProfile.bestGame} onChange = {changeInput} />
+                    </div>  
+                    <div className="inputFields">
+                        <label htmlFor="worstGame">Pire jeu</label>
+                        <input type = "text" name = "worstGame" placeholder = "Entrer un nom de jeu" value = {currentUserProfile.worstGame} onChange = {changeInput} />
+                    </div>  
+                    <div className="inputFields">
+                        <button onClick = {() => setEditMode(!editMode)}>Annuler</button>
+                        <button onClick = {updateProfile}>Valider</button>
+                    </div>   
+                </div>
+            )
+        }
+        else
+        {
+            return (
+            <div>
+                <div>
+                    <p>Pseudo : {userProfile.pseudo}</p>
+                </div>
+                <div>
+                    <p>Adresse mail : {userProfile.mail}</p>
+                </div>
+               
+                {userProfile.mostRecentGamePlayed === "" && (
+                    <div>
+                        <p>Jeu le plus récent : Aucun jeu séléctionné</p>
+                    </div>  
+                )}
+                {userProfile.mostRecentGamePlayed !== "" && (
+                    <div>
+                        <p>Jeu le plus récent : {userProfile.mostRecentGamePlayed}</p>
+                    </div>  
+                )}
+
+                {userProfile.bestGamePlayed === "" && (
+                    <div>
+                        <p>Meilleur jeu : Aucun jeu séléctionné</p>
+                    </div>  
+                )}
+                {
+                    userProfile.bestGamePlayed !== "" && (
+                        <div>
+                    <p>Meilleur jeu : {userProfile.bestGamePlayed}</p>
+                </div>  
+                )} 
+
+                {userProfile.worstGamePlayed === "" && (
+                    <div>
+                        <p>Pire jeu : Aucun jeu séléctionné</p>
+                    </div>  
+                )}
+                {userProfile.worstGamePlayed !== "" && (
+                    <div>
+                        <p>Pire jeu : {userProfile.worstGamePlayed}</p>
+                    </div>  
+                )} 
+                
+                <div>
+                    <button onClick = {() => setEditMode(!editMode)}>Modifier son profil</button>
+                </div>  
+                <div>
+                    <button onClick = {deleteProfile}>Supprimer son profil</button>
+                </div> 
+            </div>
+            )
+        }
+    }
+    //#endregion
 
     return (
         <div>
             <Topbar />
             <div id="page">
-            <div>
-                <div className="inputFields">
-                    <p>Pseudo : {userProfile.pseudo}</p>
-                </div>
-                <div className="inputFields">
-                    <p>Adresse mail : {userProfile.mail}</p>
-                </div>
-               
-                {
-                    userProfile.mostRecentGamePlayed === "" && (
-                        <div className="inputFields">
-                    <p>Jeu le plus récent : Aucun jeu séléctionné</p>
-                </div>  
-                    )
-                }
-                {userProfile.mostRecentGamePlayed != "" && (
-                    <div className="inputFields">
-                        <p>Jeu le plus récent : {userProfile.mostRecentGamePlayed}</p>
-                    </div>  
-                )}
-                {userProfile.bestGamePlayed === "" && (
-                    <div className="inputFields">
-                    <p>Meilleur jeu : Aucun jeu séléctionné</p>
-                </div>  
-                )}
-                {
-                    userProfile.bestGamePlayed != "" && (
-                        <div className="inputFields">
-                    <p>Meilleur jeu : {userProfile.bestGamePlayed}</p>
-                </div>  
-                    )
-                } 
-                {userProfile.worstGamePlayed === "" && (
-                    <div className="inputFields">
-                        <p>Pire jeu : Aucun jeu séléctionné</p>
-                    </div>  
-                )}
-                {userProfile.worstGamePlayed != "" && (
-                    <div className="inputFields">
-                        <p>Pire jeu : {userProfile.worstGamePlayed}</p>
-                    </div>  
-                )}
-
-                <div className="inputFields">
-                    <p>Membre depuis {formattedDate}</p>
+                <div>
+                    <p>Membre depuis le {userProfile.signDate}</p>
                 </div> 
                 
-                <div className="inputFields">
-                <button>Modifier son profil</button>
-                </div>   
-                <div className="inputFields">
-                    <button onClick = {deleteProfile}>Supprimer son profil</button>
-                </div>
-            </div>
+                {displayInputField()}
         </div>
             <Footer />
         </div>  

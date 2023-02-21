@@ -7,6 +7,7 @@ function Game ({img, title, category, platforms, summary, involved_companies, sl
 {
   const navigate = useNavigate();
 
+  //#region METHODS_GAME
   function getFullImage (img)
   {
     img = img.replace("t_thumb","t_cover_big");
@@ -28,6 +29,7 @@ function Game ({img, title, category, platforms, summary, involved_companies, sl
     }
     return summary;
   }
+  //#endregion
 
   return (
     <div id="post">
@@ -40,7 +42,7 @@ function Game ({img, title, category, platforms, summary, involved_companies, sl
             <button onClick={goToGamePage}>En savoir +</button>
           </div>
           <div className="gameInfos">
-            <p><span className="userInfo">Sommaire : </span>{/*sliceSummary (*/summary/*)*/}</p>
+            <p><span className="userInfo">Sommaire : </span>{sliceSummary (summary)}</p>
           </div>
       </div>  
     </div> 

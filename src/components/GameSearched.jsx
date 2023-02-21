@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import '../styles/styleGame.css';
 
 const dateFormatting = Intl.DateTimeFormat("fr-FR", {
@@ -103,6 +101,8 @@ function PostItem ({img, title, category, platforms, summary, releaseDate, age_r
         case 11:
           goodRating = "M"; 
           break;
+        default:
+          break;
       }
       return goodRating;
     }
@@ -110,8 +110,7 @@ function PostItem ({img, title, category, platforms, summary, releaseDate, age_r
 
   async function saveGame()
   {
-    const token = localStorage.getItem("userToken");
-    const response = await fetch("http://localhost:3030/addgame", 
+    await fetch("http://localhost:3030/addgame", 
     {
         method: 'POST',
         headers: {
@@ -121,19 +120,17 @@ function PostItem ({img, title, category, platforms, summary, releaseDate, age_r
 
         },
         body: JSON.stringify({
-                image: img,
-                name: title,
-                genre: goodCategory,
-                developper: goodCompanies,
-                slug: slug,
-                consoles: goodPlatform,
-                rating: goodRating,
-                description: summary,
-                releaseDate: goodDate
+          image: img,
+          name: title,
+          genre: goodCategory,
+          developper: goodCompanies,
+          slug: slug,
+          consoles: goodPlatform,
+          rating: goodRating,
+          description: summary,
+          releaseDate: goodDate
         })
     })
-    console.log(response);
-    const data = await response.json();
   }
 
   return (

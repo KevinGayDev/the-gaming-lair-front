@@ -43,7 +43,6 @@ function AddGame()
     // Return a list of games pertaining to a name and a limit
     async function searchGameAPI()
     {
-        setGameList([]);
         // Check the database for games
         const options = 
         {
@@ -56,25 +55,20 @@ function AddGame()
             body: `fields name, summary, slug, genres.name, age_ratings.rating, cover.url, involved_companies.company.name, first_release_date, platforms.name; search:"${gameName}"; limit:${gameLimit};`
         };
         
-        await fetch('https://0oa0vo5qv3.execute-api.us-west-2.amazonaws.com/production/v4/games', options)
-        .then(response => response.json())
-        .then(response => 
+        const response = await fetch('https://0oa0vo5qv3.execute-api.us-west-2.amazonaws.com/production/v4/games', options)
+        const data = await response.json();
+        if (!data) 
         {
-            if (!response) 
-            {
-                setGameList([]);
-                setErrorMsg("Aucun résultat trouvé");
-            }
+            setGameList([]);
+            setErrorMsg("Aucun résultat trouvé");
+        }
 
-            if (Array.isArray(response)) 
-            {
-                console.log(response);
-                setGameList(response);
-                setErrorMsg("");
-            }
-        })
-        .catch(err => console.error(err));
-
+        else if (Array.isArray(data)) 
+        {
+            console.log(data);
+            setGameList(data);
+            setErrorMsg("");
+        }
     }
 
     return (

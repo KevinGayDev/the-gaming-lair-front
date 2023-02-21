@@ -18,6 +18,7 @@ function Login()
     const [errorMsg, setErrorMsg]=useState ("");
     const navigate = useNavigate();
 
+    //#region METHODS_LOGIN
     // Modify input values
     function changeInput(e)
     {
@@ -36,7 +37,7 @@ function Login()
         {
             try 
             {
-                const response = await fetch("http://localhost:3030/login", 
+                const options = 
                 {
                     method: 'POST',
                     headers: {
@@ -47,19 +48,21 @@ function Login()
                         mail: userLogin.mail,
                         password: userLogin.password
                     })
-                })
-
+                };
+                const response = await fetch("http://localhost:3030/login", options);
                 const data = await response.json();
                 console.log(data);
-                if (response.status !== 200) 
+                if (data.message !== "Connexion réussie") 
                 {
                     setErrorMsg(data.message);
                     return;
                 }
-
-                localStorage.setItem("userToken", data.token);
-                setCurrentUser(data.user);  
-                navigate('/games-list');
+                else if (data.message === "Connexion réussie")
+                {
+                    localStorage.setItem("userToken", data.token);
+                    setCurrentUser(data.user);  
+                    navigate('/games-list');
+                }
             } 
             catch (error) 
             {
@@ -68,6 +71,7 @@ function Login()
             }
         }
     }
+    //#endregion
 
     return (
         <div>

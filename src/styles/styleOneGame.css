@@ -58,3 +58,26 @@
     width: 100%;
     justify-content: space-around;
 }
+
+#inputComment
+{
+    display:block;
+    width: 100%;
+}
+
+#gameComments
+{
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+}
+
+#gameComments .commentText
+{
+    width: 75%;
+}
+
+#gameComments .commentSend
+{
+    width: 25%;
+}

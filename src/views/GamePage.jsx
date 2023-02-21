@@ -1,21 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useParams } from 'react-router-dom'
 
 import Topbar from "../components/Topbar"
 import Footer from "../components/Footer"
+import Comment from "../components/Comment"
 
 import '../styles/styleOneGame.css';
+import { UserContext } from '../App';
 
 function GamePage () 
 {
     let image;
     let likesCount = 0;
     let commentsCount = 0;
+
     /* State variables */
     const [game, setGame]=useState ([]);
-    let params = useParams();
-    useEffect(() => {displayGame()}, [])
+    const {currentUser} = useContext(UserContext);
+    const [userComment, setUserComment] = useState("");
+    const [displayComments, setDisplayComments] = useState(false);
 
+    let params = useParams();
+    useEffect(() => {displayGame()})
+
+    //#region METHODS_GAME
     async function getFullImage (img)
     {
         if (img !== null)
@@ -42,7 +50,27 @@ function GamePage ()
         return commentsCount;
     }
 
-    // Return a list of games pertaining to a name and a limit
+    function displayCommentList()
+    {
+        if (displayComments === false)
+        {
+            setDisplayComments(true);
+        }
+        else if (displayComments === true)
+        {
+            setDisplayComments(false);
+        }     
+    }
+
+    function changeInput(e)
+    {
+        setUserComment (e.target.value);
+    }
+    //#endregion
+
+    //#region FETCH
+    
+    // Returns a list of games pertaining to a name and a limit
     async function displayGame()
     {
         const options = 
@@ -58,20 +86,81 @@ function GamePage ()
             })
         };
         
-        await fetch('http://localhost:3030/game', options)
-        .then(response => response.json())
-        .then(response => 
+        const response = await fetch('http://localhost:3030/game', options);
+        const data = await response.json();
+        console.log(data);
+        if (!data) 
         {
-            console.log(response);
-            if (!response) 
-            {
-                setGame([]);
-            }
-            setGame(response);
-        })
-        .catch(err => console.error(err));
-        console.log(game);
+            setGame([]);
+        }
+        setGame(data);
     }
+
+    // Add a like from the user
+    async function addLike()
+    {
+        const options = 
+        {
+            method: 'PUT',
+            headers: 
+            {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: "Bearer " + localStorage.getItem("userToken")
+            },  
+            body: JSON.stringify({
+                gameID: params.slug,
+                userID: currentUser._id
+            })
+        };
+        const response = await fetch('http://localhost:3030/game/addlike', options);
+        const data = await response.json();
+        if (data.message !== "Nombre de likes modifié") 
+        {
+            return;
+        }
+        else if (data.message === "Nombre de likes modifié") 
+        {
+            displayGame();
+        }
+    }
+
+    // Add a comment from the user
+    async function addComment()
+    {
+        if (userComment === "")
+        {
+            return;
+        }
+        const options = 
+        {
+            method: 'PUT',
+            headers: 
+            {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: "Bearer " + localStorage.getItem("userToken")
+            },  
+            body: JSON.stringify({
+                'gameID': params.slug,
+                'pseudo': currentUser.pseudo,
+                "comment": userComment      
+            })
+        };
+        const response = await fetch('http://localhost:3030/game/addcomment', options);
+        const data = await response.json();
+        if (data.message !== "Commentaire ajouté") 
+        {
+            return;
+        }
+        else if (data.message === "Commentaire ajouté") 
+        {
+            displayGame();
+            setUserComment("");
+            displayCommentList();
+        }
+    }
+    //#endregion
 
     getFullImage (game.image);
     getLikesLength (game.likes);
@@ -95,19 +184,53 @@ function GamePage ()
                     <p><span className="infosTitle">Sommaire : </span>{game.description}</p>
                 </div>
                 <div id = "gameActions">
-                <div>
-                    <p>{likesCount} personne(s) ont aimé jouer à ce jeu</p>
-                    <button>Ajouter un like</button>
+                    <div>
+                        <p>{likesCount} personne(s) ont aimé jouer à ce jeu</p>
+                        {currentUser && (
+                            <>
+                                <button onClick = {addLike}>Ajouter un like</button>
+                            </>
+                        )}
+                    </div>
+                    <div>
+                        <p>{commentsCount} commentaire(s)</p>
+                        <button onClick = {displayCommentList}>Voir les commentaires</button>
+                    </div>
                 </div>
                 <div>
-                    <p>{commentsCount} commentaire(s)</p>
-                    <button>Voir les commentaires</button>
-                </div>
+                    {currentUser && displayComments && (
+                        <>
+                        <div id = "gameComments">
+                            <input className = "commentText" type = "text" placeholder = "Entrer un commentaire" value = {userComment} onChange = {changeInput} />
+                            <button className = "commentSend" onClick = {addComment}>Envoyer</button>
+                        </div>
+                        
+                            {(game.comments).map((comment, index) => (
+                                <Comment 
+                                key = {index}
+                                pseudo = {comment.commenterName} 
+                                content = {comment.commenterPost} 
+                            />  ))}    
+                        </>
+                    )}
+                    {!currentUser && displayComments && (
+                        <>
+                            <p>Veuillez vous connecter pour envoyer des commentaires</p>
+                        
+                            {(game.comments).map((comment, index) => (
+                                <Comment 
+                                key = {index}
+                                pseudo = {comment.commenterName} 
+                                content = {comment.commenterPost} 
+                            />  ))}    
+                        
+                        </>
+                    )}
                 </div>
             </div> 
             <Footer />
     </div>  
-    );
+    )
 }
 
 export default GamePage;

@@ -16,6 +16,7 @@ function SignUp()
     const [errorMsg, setErrorMsg]=useState ("");
     const navigate = useNavigate();
 
+    //#region METHODS_SIGNUP
     // Modify input values
     function changeInput(e)
     {
@@ -32,7 +33,7 @@ function SignUp()
         }
         else 
         {
-            fetch("http://localhost:3030/signup", 
+            const options = 
             {
                 method: 'POST',
                 headers: {
@@ -44,21 +45,25 @@ function SignUp()
                     mail: userSignup.mail,
                     password: userSignup.password
                 })
-            })
-            .then((response) => response.json())
-            .then((responseData) => { return responseData; })
-            .then(results => {
-                setErrorMsg(results.message);
-                if (results.message === "Compte crée")
-                {
-                    userSignup.pseudo = "";
-                    userSignup.mail = "";
-                    userSignup.password = "";
-                    navigate('/login');
-                }
-            })
+            };
+            const response = await fetch("http://localhost:3030/signup", options);
+            const data = await response.json();
+
+            if (data.message !== "Compte crée")
+            {
+                setErrorMsg(data.message);
+            }
+            else if (data.message === "Compte crée")
+            {
+                setErrorMsg("");
+                userSignup.pseudo = "";
+                userSignup.mail = "";
+                userSignup.password = "";
+                navigate('/login');
+            }
         }
     }
+    //#endregion
 
     return (
         <div>
